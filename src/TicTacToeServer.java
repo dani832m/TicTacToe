@@ -33,7 +33,10 @@ public class TicTacToeServer {
      * Runs the application. Pairs up clients that connect.
      */
     public static void main(String[] args) throws Exception {
+        //Laver et nyt ServerSocket-objekt som lytter på port 8901
         ServerSocket listener = new ServerSocket(8901);
+
+        //Skriver til konsollen, hvis serveren kører
         System.out.println("Tic Tac Toe Server is Running");
         try {
             while (true) {
