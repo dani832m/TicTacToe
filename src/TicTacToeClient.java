@@ -97,8 +97,8 @@ public class TicTacToeClient {
             response = in.readLine();
             if (response.startsWith("WELCOME")) {
                 char mark = response.charAt(8);
-                icon = new ImageIcon(mark == 'X' ? "x.gif" : "o.gif");
-                opponentIcon  = new ImageIcon(mark == 'X' ? "o.gif" : "x.gif");
+                icon = new ImageIcon(mark == 'X' ? "res/blueX.png" : "res/blueCircle.png");
+                opponentIcon  = new ImageIcon(mark == 'X' ? "res/redCircle.png" : "res/redX.png");
                 frame.setTitle("Tic Tac Toe - Player " + mark);
             }
             while (true) {
@@ -167,7 +167,7 @@ public class TicTacToeClient {
             String serverAddress = (args.length == 0) ? "localhost" : args[1];
             TicTacToeClient client = new TicTacToeClient(serverAddress);
             client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            client.frame.setSize(240, 160);
+            client.frame.setSize(500, 570);
             client.frame.setVisible(true);
             client.frame.setResizable(false);
             client.play();
