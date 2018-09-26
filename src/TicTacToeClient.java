@@ -35,17 +35,17 @@ public class TicTacToeClient {
 
     /**
      * Konstruerer klienten ved at connecte til en server, som sender
-     * en GUI ud og registerer klienten af GUI'en
+     * en GUI ud og registerer klienten af GUI'en.
      */
     public TicTacToeClient(String serverAddress) throws Exception {
 
-        // Netværkets setup
+        // Netværkets setup.
         socket = new Socket(serverAddress, PORT);
         in = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
 
-        // Layout GUI
+        // Layout GUI.
         messageLabel.setBackground(Color.lightGray);
         frame.getContentPane().add(messageLabel, "South");
 
