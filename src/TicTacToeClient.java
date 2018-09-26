@@ -15,26 +15,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
- * A client for the TicTacToe game, modified and extended from the
- * class presented in Deitel and Deitel "Java How to Program" book.
- * I made a bunch of enhancements and rewrote large sections of the
- * code.  In particular I created the TTTP (Tic Tac Toe Protocol)
- * which is entirely text based.  Here are the strings that are sent:
- *
- *  Client -> Server           Server -> Client
- *  ----------------           ----------------
- *  MOVE <n>  (0 <= n <= 8)    WELCOME <char>  (char in {X, O})
- *  QUIT                       VALID_MOVE
- *                             OTHER_PLAYER_MOVED <n>
- *                             VICTORY
- *                             DEFEAT
- *                             TIE
- *                             MESSAGE <text>
- *
+ * En klientklasse for Kryds og Bolle, modificeret og udvidet fra klassen,
+ * som er præsenteret i bogen: Deitel and Deitel "Java How to Program".
  */
 public class TicTacToeClient {
 
-    private JFrame frame = new JFrame("Tic Tac Toe");
+    private JFrame frame = new JFrame("Kryds og Bolle");
     private JLabel messageLabel = new JLabel("");
     private ImageIcon icon;
     private ImageIcon opponentIcon;
@@ -48,18 +34,18 @@ public class TicTacToeClient {
     private PrintWriter out;
 
     /**
-     * Constructs the client by connecting to a server, laying out the
-     * GUI and registering GUI listeners.
+     * Konstruerer klienten ved at connecte til en server, som sender
+     * en GUI ud og registerer klienten af GUI'en.
      */
     public TicTacToeClient(String serverAddress) throws Exception {
 
-        // Setup networking
+        // Netværkets setup.
         socket = new Socket(serverAddress, PORT);
         in = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
 
-        // Layout GUI
+        // Layout GUI.
         messageLabel.setBackground(Color.lightGray);
         frame.getContentPane().add(messageLabel, "South");
 
@@ -79,17 +65,14 @@ public class TicTacToeClient {
     }
 
     /**
-     * The main thread of the client will listen for messages
-     * from the server.  The first message will be a "WELCOME"
-     * message in which we receive our mark.  Then we go into a
-     * loop listening for "VALID_MOVE", "OPPONENT_MOVED", "VICTORY",
-     * "DEFEAT", "TIE", "OPPONENT_QUIT or "MESSAGE" messages,
-     * and handling each message appropriately.  The "VICTORY",
-     * "DEFEAT" and "TIE" ask the user whether or not to play
-     * another game.  If the answer is no, the loop is exited and
-     * the server is sent a "QUIT" message.  If an OPPONENT_QUIT
-     * message is recevied then the loop will exit and the server
-     * will be sent a "QUIT" message also.
+     * Klientens main thread vil lytte efter beskeder fra serveren.
+     * Den første besked vil være "WELCOME", hvor vi modtager vores
+     * brik. Herefter kommer vi ind i et loop som lytter efter
+     * "VALID_MOVE", "OPPONENT MOVED", "VICTORY", "DEFEAT", "TIE",
+     * "OPPENENT_QUIT", eller "MESSAGE". Beskeden "VICTORY", "DEFEAT"
+     * og "TIE" spørg om brugeren vil spille et nyt spil eller ej.
+     * Hvis svaret er nej, så stopper vores loop og der bliver sendt
+     * en "QUIT" besked. Det samme sker, hvis modspilleren siger nej.
      */
     public void play() throws Exception {
         String response;
@@ -99,27 +82,27 @@ public class TicTacToeClient {
                 char mark = response.charAt(8);
                 icon = new ImageIcon(mark == 'X' ? "res/blueX.png" : "res/blueCircle.png");
                 opponentIcon  = new ImageIcon(mark == 'X' ? "res/redCircle.png" : "res/redX.png");
-                frame.setTitle("Tic Tac Toe - Player " + mark);
+                frame.setTitle("Kryds og Bolle - Spiller " + mark);
             }
             while (true) {
                 response = in.readLine();
                 if (response.startsWith("VALID_MOVE")) {
-                    messageLabel.setText("Valid move, please wait");
+                    messageLabel.setText("Modstanders tur.");
                     currentSquare.setIcon(icon);
                     currentSquare.repaint();
                 } else if (response.startsWith("OPPONENT_MOVED")) {
                     int loc = Integer.parseInt(response.substring(15));
                     board[loc].setIcon(opponentIcon);
                     board[loc].repaint();
-                    messageLabel.setText("Opponent moved, your turn");
+                    messageLabel.setText("Din tur.");
                 } else if (response.startsWith("VICTORY")) {
-                    messageLabel.setText("You win");
+                    messageLabel.setText("Du har vundet!");
                     break;
                 } else if (response.startsWith("DEFEAT")) {
-                    messageLabel.setText("You lose");
+                    messageLabel.setText("Du har tabt!");
                     break;
                 } else if (response.startsWith("TIE")) {
-                    messageLabel.setText("You tied");
+                    messageLabel.setText("Uafgjort!");
                     break;
                 } else if (response.startsWith("MESSAGE")) {
                     messageLabel.setText(response.substring(8));
@@ -134,17 +117,17 @@ public class TicTacToeClient {
 
     private boolean wantsToPlayAgain() {
         int response = JOptionPane.showConfirmDialog(frame,
-                "Want to play again?",
-                "Tic Tac Toe is Fun Fun Fun",
+                "Spil igen?",
+                "Kryds og Bolle er sjooooooovt! :D",
                 JOptionPane.YES_NO_OPTION);
         frame.dispose();
         return response == JOptionPane.YES_OPTION;
     }
 
     /**
-     * Graphical square in the client window.  Each square is
-     * a white panel containing.  A client calls setIcon() to fill
-     * it with an Icon, presumably an X or O.
+     * Grafisk firkant i klientens vindue. Hver firkant er en "white
+     * panel containing". En klient caller setIcon() for at fylde ud
+     * med et ikon, altså X eller O.
      */
     static class Square extends JPanel {
         JLabel label = new JLabel((Icon)null);
@@ -160,7 +143,7 @@ public class TicTacToeClient {
     }
 
     /**
-     * Runs the client as an application.
+     * Starter klienten som en applikation.
      */
     public static void main(String[] args) throws Exception {
         while (true) {

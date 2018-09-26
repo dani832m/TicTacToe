@@ -1,6 +1,12 @@
 # TicTacToe
 Client/Server "Kryds &amp; Bolle" baseret på Java Socket-programmering.
 
+- Først køres klassen "TicTacToeServer", så en server bliver etableret lokalt.
+- Dernæst køres klassen "TicTacToeClient" to gange, således at klienten kontakter serveren to gange. På den måde får vi altså to vinduer, som henholdsvis repræsenterer "x" og "o".
+
+# Screenshot
+![alt text](https://i.imgur.com/Pctv9UA.png)
+
 # Wikipedia forklarer reglerne
 Kryds og bolle er et af verdens hurtigste og mest spillede spil. I kryds og bolle er der to deltagere, der spiller med henholdsvis kryds og bolle.
 
