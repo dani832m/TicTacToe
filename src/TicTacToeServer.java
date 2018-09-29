@@ -1,3 +1,4 @@
+// Imports
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,23 +7,36 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Serveren til vores netværks multi-player tic tac toe spil.
+ * Serverklassen til vores netværks-multi-player TicTacToe-spil.
+ *
+ * Client -> Server           Server -> Client
+ * ----------------           ----------------
+ * MOVE <n>  (0 <= n <= 8)    WELCOME <char>  (char in {X, O})
+ * QUIT                       VALID_MOVE
+ *                            OTHER_PLAYER_MOVED <n>
+ *                            VICTORY
+ *                            DEFEAT
+ *                            TIE
+ *                            MESSAGE <text>
  */
 public class TicTacToeServer {
 
     /**
-     * Kører applikationen.
-     * Og forbinder klienter der tilslutter.
+     * Kører applikationen, og forbinder klienter der tilslutter.
      */
     public static void main(String[] args) throws Exception {
-        //Laver et nyt ServerSocket-objekt som lytter på port 8901
+
+        // Laver et nyt ServerSocket-objekt som lytter på port 8901.
         ServerSocket listener = new ServerSocket(8901);
 
-        //Skriver til konsollen, hvis serveren kører
-        System.out.println("Tic Tac Toe Server kører");
+        // Skriver til konsollen, hvis serveren kører.
+        System.out.println("TicTacToe-server kører!");
+
+        // Kører et while-loop, der deklarerer og initialiserer et nyt Game-objekt.
         try {
             while (true) {
                 Game game = new Game();
+                // Spiller X og O kobles på spil-objektet.
                 Game.Player playerX = game.new Player(listener.accept(), 'X');
                 Game.Player playerO = game.new Player(listener.accept(), 'O');
                 playerX.setOpponent(playerO);
@@ -38,7 +52,7 @@ public class TicTacToeServer {
 }
 
 /**
- * Et multi-player spil.
+ * Inner class. Game-klassen bruges i ovenstående kode i TicTacToeServer.java
  */
 class Game {
 
@@ -46,22 +60,19 @@ class Game {
      * Et bræt har 9 felter.
      * Hvert felt er enten tomt eller besat af en spiller.
      * Derfor bruger vi få simpele henvisninger.
-     * Hvis en arraycelle viser null, Er det tilsvarende felt tomt,
-     * og ellers lagrers en henvisning til spilleren der
-     * har besat det.
+     * Hvis en arraycelle viser null, rr det tilsvarende felt tomt,
+     * og ellers lagres en henvisning til spilleren der har besat det.
      */
     private Player[] board = {
             null, null, null,
             null, null, null,
             null, null, null};
 
-    /**
-     * Den nuværende spiller.
-     */
+    // Den nuværende spiller.
     Player currentPlayer;
 
     /**
-     * Returnerer om der er en vinder, med den nuværende besættelse af spillepladen.
+     * Returnerer, om der er en vinder, med den nuværende besættelse af spillepladen.
      */
     public boolean hasWinner() {
         return
@@ -76,7 +87,7 @@ class Game {
     }
 
     /**
-     * Returnerer om alle felter er besatte.
+     * Returnerer, om alle felter er besatte.
      */
     public boolean boardFilledUp() {
         for (int i = 0; i < board.length; i++) {
@@ -88,8 +99,7 @@ class Game {
     }
 
     /**
-     * Kaldet af player trådene når en spiller prøver at besætte en
-     * plads.
+     * Kaldet af player trådene, når en spiller prøver at besætte en plads.
      * Metoden tjekker om en besættelse er godkendt:
      * spilleren som prøver at besætte har turen,
      * og at feltet som førsøgt besat er frit.
@@ -109,7 +119,7 @@ class Game {
 
     /**
      * Klasse indeholdende en socket med dens input og output,
-     * da input kun er tekst bruger vi en reader og en writer.
+     * da input kun er tekst, bruger vi en reader og en writer.
      */
     class Player extends Thread {
         char mark;
@@ -118,7 +128,6 @@ class Game {
         BufferedReader input;
         PrintWriter output;
 
-
         public Player(Socket socket, char mark) {
             this.socket = socket;
             this.mark = mark;
@@ -126,27 +135,27 @@ class Game {
                 input = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
                 output = new PrintWriter(socket.getOutputStream(), true);
-                output.println("Welkommen " + mark);
-                output.println("Venter på modspiller");
+                output.println("WELCOME " + mark);
+                output.println("MESSAGE Venter på modspiller...");
             } catch (IOException e) {
                 System.out.println("Spiller døde: " + e);
             }
         }
 
         /**
-         * Besked om hvem modspilleren er.
+         * Besked om, hvem modspilleren er.
          */
         public void setOpponent(Player opponent) {
             this.opponent = opponent;
         }
 
         /**
-         * Giver besked om at modspilleren har taget sin tur.
+         * Giver besked om, at modspilleren har taget sin tur.
          */
         public void otherPlayerMoved(int location) {
-            output.println("Modstander_Valgte " + location);
+            output.println("OPPONENT_MOVED " + location);
             output.println(
-                    hasWinner() ? "Du Tabte" : boardFilledUp() ? "Uafgjordt" : "");
+                    hasWinner() ? "DEFEAT" : boardFilledUp() ? "TIE" : "");
         }
 
         /**
@@ -154,28 +163,28 @@ class Game {
          */
         public void run() {
             try {
-                // Tråden starter når to spillere er forbundet.
-                output.println("Begge spillere er forbundet");
+                // Tråden starter, når to spillere er forbundet.
+                output.println("Begge spillere er forbundet.");
 
                 // Besked til første spiller om at starte.
                 if (mark == 'X') {
-                    output.println("Din tur");
+                    output.println("MESSAGE Din tur.");
                 }
 
                 // Får kommandoer fra klienten og behandler dem.
                 while (true) {
                     String command = input.readLine();
-                    if (command.startsWith("Besæt")) {
+                    if (command.startsWith("MOVE")) {
                         int location = Integer.parseInt(command.substring(5));
                         if (legalMove(location, this)) {
-                            output.println("Godkendt_Besætning");
-                            output.println(hasWinner() ? "Du vandt"
-                                    : boardFilledUp() ? "Uafgjordt"
+                            output.println("VALID_MOVE");
+                            output.println(hasWinner() ? "VICTORY"
+                                    : boardFilledUp() ? "TIE"
                                     : "");
                         } else {
-                            output.println("Besked ?");
+                            output.println("MESSAGE ?");
                         }
-                    } else if (command.startsWith("Luk")) {
+                    } else if (command.startsWith("QUIT")) {
                         return;
                     }
                 }

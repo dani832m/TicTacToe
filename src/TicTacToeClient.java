@@ -1,3 +1,4 @@
+// Imports fra bl.a. AWT, Swing og io
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -6,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -67,11 +67,11 @@ public class TicTacToeClient {
     /**
      * Klientens main thread vil lytte efter beskeder fra serveren.
      * Den første besked vil være "WELCOME", hvor vi modtager vores
-     * brik. Herefter kommer vi ind i et loop som lytter efter
+     * brik. Herefter kommer vi ind i et loop, som lytter efter
      * "VALID_MOVE", "OPPONENT MOVED", "VICTORY", "DEFEAT", "TIE",
      * "OPPENENT_QUIT", eller "MESSAGE". Beskeden "VICTORY", "DEFEAT"
-     * og "TIE" spørg om brugeren vil spille et nyt spil eller ej.
-     * Hvis svaret er nej, så stopper vores loop og der bliver sendt
+     * og "TIE" spørger, om brugeren vil spille et nyt spil eller ej.
+     * Hvis svaret er nej, så stopper vores loop, og der bliver sendt
      * en "QUIT" besked. Det samme sker, hvis modspilleren siger nej.
      */
     public void play() throws Exception {
