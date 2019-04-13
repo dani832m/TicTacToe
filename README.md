@@ -1,4 +1,4 @@
-# TicTacToe
+# Tic Tac Toe
 Client/Server "Kryds &amp; Bolle" baseret på Java Socket-programmering.
 
 - Først køres klassen "TicTacToeServer", så en server bliver etableret lokalt.
